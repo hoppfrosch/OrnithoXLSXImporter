@@ -163,10 +163,10 @@ class OrnithoXLSXImporter:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/Ornitho_XSLX_Importer/icon.png'
+        icon_path = ':/plugins/Ornitho_XSLX_Importer/res/goose.svg'
         self.add_action(
             icon_path,
-            text=self.tr(u'Ornith XLSX Importer'),
+            text=self.tr(u'Ornitho XLSX Importer'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
