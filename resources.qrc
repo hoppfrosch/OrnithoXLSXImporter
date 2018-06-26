@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/Ornitho_XSLX_Importer" >
+    <qresource prefix="/plugins/Ornitho_XLSX_Importer" >
         <file>res/goose.svg</file>
     </qresource>
 </RCC>

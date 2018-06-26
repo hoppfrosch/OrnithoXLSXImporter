@@ -21,14 +21,14 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QFileDialog
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
-from .Ornitho_XSLX_Importer_dialog import OrnithoXLSXImporterDialog
+from .Ornitho_XLSX_Importer_dialog import OrnithoXLSXImporterDialog
 import os.path
 
 
@@ -66,10 +66,17 @@ class OrnithoXLSXImporter:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Ornitho XSLX Importer')
+        self.menu = self.tr(u'&Ornitho XLSX Importer')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'OrnithoXLSXImporter')
         self.toolbar.setObjectName(u'OrnithoXLSXImporter')
+
+        self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
+
+        #self.dlg.ok.clicked.connect(self.ok)
+        #self.dlg.closebutton.clicked.connect(self.close)
+        self.dlg.toolButtonXLSXSelect.clicked.connect(self.toolButtonXLSXSelect)
+        #self.dlg.toolButtonGPKGSelect.clicked.connect(self.toolButtonGPKGSelect)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -163,7 +170,7 @@ class OrnithoXLSXImporter:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/Ornitho_XSLX_Importer/res/goose.svg'
+        icon_path = ':/plugins/Ornitho_XLSX_Importer/res/goose.svg'
         self.add_action(
             icon_path,
             text=self.tr(u'Ornitho XLSX Importer'),
@@ -175,7 +182,8 @@ class OrnithoXLSXImporter:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Ornitho XSLX Importer'),
+                self
+                .tr(u'&Ornitho XLSX Importer'),
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
@@ -184,6 +192,12 @@ class OrnithoXLSXImporter:
 
     def run(self):
         """Run method that performs all the real work"""
+
+        self.dlg.GPKGgroupBox.setEnabled(False)
+        self.dlg.XLSXgroupBox.setEnabled(True)
+        self.dlg.lineEditXLSXFile.setText('UNKNOWN')
+        self.dlg.lineEditGPKGFile.setText('MISSING')
+
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -193,3 +207,12 @@ class OrnithoXLSXImporter:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+    def toolButtonXLSXSelect(self):
+        """Select the XLSX-File to be imported"""
+        # try:
+        filename  = QFileDialog.getOpenFileName(None, 'Wähle XLXS-Export Datei aus Ornitho:', os.path.join(os.path.join(os.path.expanduser('~'))),  "Excel-File (*.xlsx)")
+        self.fileXLSX = filename[0]
+        if self.fileXLSX == "":
+            return
+        self.dlg.lineEditXLSXFile.setText(self.fileXLSX)

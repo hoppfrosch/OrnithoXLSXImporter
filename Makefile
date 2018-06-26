@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	Ornitho_XSLX_Importer.py Ornitho_XSLX_Importer_dialog.py
+	Ornitho_XLSX_Importer.py Ornitho_XLSX_Importer_dialog.py
 
-PLUGINNAME = Ornitho_XSLX_Importer
+PLUGINNAME = Ornitho_XLSX_Importer
 
 PY_FILES = \
 	__init__.py \
-	Ornitho_XSLX_Importer.py Ornitho_XSLX_Importer_dialog.py
+	Ornitho_XLSX_Importer.py Ornitho_XLSX_Importer_dialog.py
 
-UI_FILES = Ornitho_XSLX_Importer_dialog_base.ui
+UI_FILES = Ornitho_XLSX_Importer_dialog_base.ui
 
 EXTRAS = metadata.txt icon.png
 

@@ -32,5 +32,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .Ornitho_XSLX_Importer import OrnithoXLSXImporter
+    from .Ornitho_XLSX_Importer import OrnithoXLSXImporter
     return OrnithoXLSXImporter(iface)

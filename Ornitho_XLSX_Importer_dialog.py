@@ -28,7 +28,7 @@ from PyQt5 import uic
 from PyQt5 import QtWidgets
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'Ornitho_XSLX_Importer_dialog_base.ui'))
+    os.path.dirname(__file__), 'Ornitho_XLSX_Importer_dialog_base.ui'))
 
 
 class OrnithoXLSXImporterDialog(QtWidgets.QDialog, FORM_CLASS):

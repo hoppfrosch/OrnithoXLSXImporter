@@ -9,7 +9,7 @@
 [general]
 name=Ornitho XSLX Importer
 qgisMinimumVersion=3.0
-description=Imports ornthological observations exported from https://www.ornitho.de/
+description=Imports ornithological observations exported from https://www.ornitho.de/ into a geopackage
 version=0.1
 author=Johannes Kilian
 email=hoppfrosch@gmx.de

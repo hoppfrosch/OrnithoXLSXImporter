@@ -14,9 +14,9 @@ __copyright__ = 'Copyright 2018, Johannes Kilian'
 
 import unittest
 
-from PyQt5.QtGui import QDialogButtonBox, QDialog
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
-from Ornitho_XSLX_Importer_dialog import OrnithoXLSXImporterDialog
+from Ornitho_XLSX_Importer_dialog import OrnithoXLSXImporterDialog
 
 from utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
