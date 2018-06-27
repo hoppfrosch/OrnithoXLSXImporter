@@ -31,6 +31,7 @@ from .resources import *
 from .Ornitho_XLSX_Importer_dialog import OrnithoXLSXImporterDialog
 import os.path
 
+__version__ = '0.1.0'
 
 class OrnithoXLSXImporter:
     """QGIS Plugin Implementation."""
@@ -71,10 +72,11 @@ class OrnithoXLSXImporter:
         self.toolbar = self.iface.addToolBar(u'OrnithoXLSXImporter')
         self.toolbar.setObjectName(u'OrnithoXLSXImporter')
 
+        # Read the settings
+        self.readSettings()
+
         # self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
         self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
-        #self.dlg.ok.clicked.connect(self.ok)
-        #self.dlg.closebutton.clicked.connect(self.close)
         self.dlg.toolButtonXLSXSelect.clicked.connect(self.toolButtonXLSXSelect)
         self.dlg.toolButtonGPKGSelect.clicked.connect(self.toolButtonGPKGSelect)
 
@@ -195,8 +197,8 @@ class OrnithoXLSXImporter:
 
         self.dlg.GPKGgroupBox.setEnabled(True)
         self.dlg.XLSXgroupBox.setEnabled(True)
-        self.dlg.lineEditXLSXFile.setText('')
-        self.dlg.lineEditGPKGFile.setText('')
+        self.dlg.lineEditXLSXFile.setText(self.fileXLSX)
+        self.dlg.lineEditGPKGFile.setText(self.fileGPKG)
 
         # show the dialog
         self.dlg.show()
@@ -211,17 +213,36 @@ class OrnithoXLSXImporter:
     def toolButtonXLSXSelect(self):
         """Select the XLSX-File to be imported"""
         # try:
-        filename  = QFileDialog.getOpenFileName(None, 'Waehle XLXS-Export Datei aus Ornitho:', os.path.join(os.path.join(os.path.expanduser('~'))),  "Excel-File (*.xlsx)")
+        filename  = QFileDialog.getOpenFileName(None, 'Waehle XLXS-Export Datei aus Ornitho:', self.fileXLSX, "Excel-File (*.xlsx)")
         self.fileXLSX = filename[0]
         if self.fileXLSX == "":
             return
         self.dlg.lineEditXLSXFile.setText(self.fileXLSX)
+        self.storeSettings()
 
     def toolButtonGPKGSelect(self):
         """Select the Geopackage to export the data to"""
-        filename  = QFileDialog.getSaveFileName(None, 'Waehle Geopackage-Ausgabedatei:', os.path.join(os.path.join(os.path.expanduser('~'))),  "Geopackage-File (*.gpkg)")
+        filename  = QFileDialog.getSaveFileName(None, 'Waehle Geopackage-Ausgabedatei:', self.fileGPKG, "Geopackage-File (*.gpkg)")
         self.fileGPKG = filename[0]
         if self.fileGPKG == "":
             return
         self.dlg.lineEditGPKGFile.setText(self.fileGPKG)
+        self.storeSettings()
 
+    def storeSettings(self):
+        s = QSettings()
+        s.setValue("OrnithoXLSXImporter/fileXLSX", self.fileXLSX)
+        s.setValue("OrnithoXLSXImporter/fileGPKG", self.fileGPKG)
+
+    def readSettings(self):
+        defaultPath = os.path.join(os.path.join(os.path.expanduser('~')))
+        defaultXLSX = os.path.join(defaultPath, "export.xlsx")
+        defaultGPKG = os.path.join(defaultPath, "ornitho.gpkg")
+        s = QSettings()
+        self.fileXLSX = s.value("OrnithoXLSXImporter/fileXLSX", defaultXLSX)
+        self.fileGPKG = s.value("OrnithoXLSXImporter/fileGPKG", defaultGPKG)
+
+    def clearSettings(self):
+        s = QSettings()
+        s.remove("OrnithoXLSXImporter/fileXLSX")
+        s.remove("OrnithoXLSXImporter/fileGPKG")
