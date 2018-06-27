@@ -71,12 +71,12 @@ class OrnithoXLSXImporter:
         self.toolbar = self.iface.addToolBar(u'OrnithoXLSXImporter')
         self.toolbar.setObjectName(u'OrnithoXLSXImporter')
 
-        self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
-
+        # self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
+        self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
         #self.dlg.ok.clicked.connect(self.ok)
         #self.dlg.closebutton.clicked.connect(self.close)
         self.dlg.toolButtonXLSXSelect.clicked.connect(self.toolButtonXLSXSelect)
-        #self.dlg.toolButtonGPKGSelect.clicked.connect(self.toolButtonGPKGSelect)
+        self.dlg.toolButtonGPKGSelect.clicked.connect(self.toolButtonGPKGSelect)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -193,10 +193,10 @@ class OrnithoXLSXImporter:
     def run(self):
         """Run method that performs all the real work"""
 
-        self.dlg.GPKGgroupBox.setEnabled(False)
+        self.dlg.GPKGgroupBox.setEnabled(True)
         self.dlg.XLSXgroupBox.setEnabled(True)
-        self.dlg.lineEditXLSXFile.setText('UNKNOWN')
-        self.dlg.lineEditGPKGFile.setText('MISSING')
+        self.dlg.lineEditXLSXFile.setText('')
+        self.dlg.lineEditGPKGFile.setText('')
 
         # show the dialog
         self.dlg.show()
@@ -211,8 +211,17 @@ class OrnithoXLSXImporter:
     def toolButtonXLSXSelect(self):
         """Select the XLSX-File to be imported"""
         # try:
-        filename  = QFileDialog.getOpenFileName(None, 'Wähle XLXS-Export Datei aus Ornitho:', os.path.join(os.path.join(os.path.expanduser('~'))),  "Excel-File (*.xlsx)")
+        filename  = QFileDialog.getOpenFileName(None, 'Waehle XLXS-Export Datei aus Ornitho:', os.path.join(os.path.join(os.path.expanduser('~'))),  "Excel-File (*.xlsx)")
         self.fileXLSX = filename[0]
         if self.fileXLSX == "":
             return
         self.dlg.lineEditXLSXFile.setText(self.fileXLSX)
+
+    def toolButtonGPKGSelect(self):
+        """Select the Geopackage to export the data to"""
+        filename  = QFileDialog.getSaveFileName(None, 'Waehle Geopackage-Ausgabedatei:', os.path.join(os.path.join(os.path.expanduser('~'))),  "Geopackage-File (*.gpkg)")
+        self.fileGPKG = filename[0]
+        if self.fileGPKG == "":
+            return
+        self.dlg.lineEditGPKGFile.setText(self.fileGPKG)
+
