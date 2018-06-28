@@ -31,7 +31,7 @@ from .resources import *
 from .Ornitho_XLSX_Importer_dialog import OrnithoXLSXImporterDialog
 import os.path
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 class OrnithoXLSXImporter:
     """QGIS Plugin Implementation."""
@@ -75,10 +75,13 @@ class OrnithoXLSXImporter:
         # Read the settings
         self.readSettings()
 
-        # self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
         self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
         self.dlg.toolButtonXLSXSelect.clicked.connect(self.toolButtonXLSXSelect)
         self.dlg.toolButtonGPKGSelect.clicked.connect(self.toolButtonGPKGSelect)
+
+        self.layerGPKG = os.path.splitext(os.path.basename(self.fileXLSX))[0]
+        self.dlg.comboBoxLayerGPKG.setCurrentText(self.layerGPKG)
+
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -200,6 +203,9 @@ class OrnithoXLSXImporter:
         self.dlg.lineEditXLSXFile.setText(self.fileXLSX)
         self.dlg.lineEditGPKGFile.setText(self.fileGPKG)
 
+        self.dlg.comboBoxLayerGPKG.setCurrentText(self.layerGPKG)
+
+
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -230,19 +236,27 @@ class OrnithoXLSXImporter:
         self.storeSettings()
 
     def storeSettings(self):
+        """Store the settings into global QGIS-Settings"""
         s = QSettings()
         s.setValue("OrnithoXLSXImporter/fileXLSX", self.fileXLSX)
         s.setValue("OrnithoXLSXImporter/fileGPKG", self.fileGPKG)
+        s.setValue("OrnithoXLSXImporter/layerGPKG", self.layerGPKG)
 
     def readSettings(self):
+        """Restore the settings from global QGIS-Settings"""
         defaultPath = os.path.join(os.path.join(os.path.expanduser('~')))
         defaultXLSX = os.path.join(defaultPath, "export.xlsx")
         defaultGPKG = os.path.join(defaultPath, "ornitho.gpkg")
+        defaultLayerGPKG = os.path.splitext(os.path.basename(defaultXLSX))[0]
+
         s = QSettings()
         self.fileXLSX = s.value("OrnithoXLSXImporter/fileXLSX", defaultXLSX)
         self.fileGPKG = s.value("OrnithoXLSXImporter/fileGPKG", defaultGPKG)
+        self.layerGPKG = s.value("OrnithoXLSXImporter/layerGPKG", defaultLayerGPKG)
 
     def clearSettings(self):
+        """Delete the settings from global QGIS-Settings"""
         s = QSettings()
         s.remove("OrnithoXLSXImporter/fileXLSX")
         s.remove("OrnithoXLSXImporter/fileGPKG")
+        s.remove("OrnithoXLSXImporter/layerGPKG")
