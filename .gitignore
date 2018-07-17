@@ -3,3 +3,4 @@ resources.py
 Examples
 test/__pycache__/
 __pycache__/
+*.gpkg
