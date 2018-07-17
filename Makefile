@@ -38,13 +38,13 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	Ornitho_XLSX_Importer.py Ornitho_XLSX_Importer_dialog.py
+	Ornitho_XLSX_Importer.py Ornitho_XLSX_Importer_dialog.py Ornitho_Geopackage.py
 
 PLUGINNAME = Ornitho_XLSX_Importer
 
 PY_FILES = \
 	__init__.py \
-	Ornitho_XLSX_Importer.py Ornitho_XLSX_Importer_dialog.py
+	Ornitho_XLSX_Importer.py Ornitho_XLSX_Importer_dialog.py Ornitho_Geopackage.py
 
 UI_FILES = Ornitho_XLSX_Importer_dialog_base.ui
 
