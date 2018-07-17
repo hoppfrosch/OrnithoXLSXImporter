@@ -6,14 +6,12 @@ from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 
-__version__ = "0.1.0a2"
-
 
 class OrnithoGeopackage:
     """Geopackage to hold data from Ornitho"""
 
     def __init__(self, pathGPKG, layername):
-        print(int(gdal.VersionInfo('VERSION_NUM')))
+        # print(int(gdal.VersionInfo('VERSION_NUM')))
 
         if int(gdal.VersionInfo('VERSION_NUM')) < 2020000:
             raise Exception('Geopackage requires GDAL >= 2.2')
@@ -31,10 +29,7 @@ class OrnithoGeopackage:
             layername, self.srs, geom_type=ogr.wkbPoint)
 
         os.chdir(cwd)
-        coltypes = self.coltypes()
-        print(coltypes)
-
-        for k, v in coltypes.items():
+        for k, v in self.coltypes().items():
             self.lyr.CreateField(ogr.FieldDefn(k, v))
 
     def columns(self):
@@ -156,5 +151,5 @@ class OrnithoGeopackage:
         return colnames
 
 
-test = OrnithoGeopackage(
-    "w:\Develop\OrnithoXLSXmporter\Data\jok_test_new.gpkg", "ornitho")
+# test = OrnithoGeopackage(
+#    "w:\Develop\OrnithoXLSXmporter\Data\jok_test_new.gpkg", "ornitho")

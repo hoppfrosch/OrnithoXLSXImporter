@@ -29,9 +29,12 @@ from PyQt5.QtWidgets import QAction, QFileDialog
 from .resources import *
 # Import the code for the dialog
 from .Ornitho_XLSX_Importer_dialog import OrnithoXLSXImporterDialog
+from .Ornitho_Geopackage import OrnithoGeopackage
+
 import os.path
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
+
 
 class OrnithoXLSXImporter:
     """QGIS Plugin Implementation."""
@@ -75,15 +78,23 @@ class OrnithoXLSXImporter:
         # Read the settings
         self.readSettings()
 
-        self.dlg.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
-        self.dlg.toolButtonXLSXSelect.clicked.connect(self.toolButtonXLSXSelect)
-        self.dlg.toolButtonGPKGSelect.clicked.connect(self.toolButtonGPKGSelect)
+        self.dlg.setWindowFlags(Qt.CustomizeWindowHint |
+                                Qt.WindowCloseButtonHint)
+        self.dlg.toolButtonXLSXSelect.clicked.connect(
+            self.toolButtonXLSXSelect)
+        self.dlg.toolButtonGPKGSelect.clicked.connect(
+            self.toolButtonGPKGSelect)
 
         self.layerGPKG = os.path.splitext(os.path.basename(self.fileXLSX))[0]
         self.dlg.comboBoxLayerGPKG.setCurrentText(self.layerGPKG)
 
+        # ToDo: implement Not yet implemented Features - until then disable corresponding options
+        self.dlg.checkBoxGPKGOverwrite.setChecked(True)
+        self.dlg.checkBoxGPKGOverwrite.setEnabled(False)
+        self.dlg.groupBoxLayerOptions.setEnabled(False)
 
     # noinspection PyMethodMayBeStatic
+
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
@@ -98,18 +109,17 @@ class OrnithoXLSXImporter:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('OrnithoXLSXImporter', message)
 
-
     def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
+            self,
+            icon_path,
+            text,
+            callback,
+            enabled_flag=True,
+            add_to_menu=True,
+            add_to_toolbar=True,
+            status_tip=None,
+            whats_this=None,
+            parent=None):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -182,7 +192,6 @@ class OrnithoXLSXImporter:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -194,7 +203,6 @@ class OrnithoXLSXImporter:
         # remove the toolbar
         del self.toolbar
 
-
     def run(self):
         """Run method that performs all the real work"""
 
@@ -205,6 +213,7 @@ class OrnithoXLSXImporter:
 
         self.dlg.comboBoxLayerGPKG.setCurrentText(self.layerGPKG)
 
+        self.setLayerUpdate()
 
         # show the dialog
         self.dlg.show()
@@ -212,6 +221,8 @@ class OrnithoXLSXImporter:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
+            # OK button was pressed
+            test = OrnithoGeopackage(self.fileGPKG, self.layerGPKG)
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
@@ -219,21 +230,33 @@ class OrnithoXLSXImporter:
     def toolButtonXLSXSelect(self):
         """Select the XLSX-File to be imported"""
         # try:
-        filename  = QFileDialog.getOpenFileName(None, 'Waehle XLXS-Export Datei aus Ornitho:', self.fileXLSX, "Excel-File (*.xlsx)")
+        filename = QFileDialog.getOpenFileName(
+            None, 'Waehle XLXS-Export Datei aus Ornitho:', self.fileXLSX, "Excel-File (*.xlsx)")
         self.fileXLSX = filename[0]
         if self.fileXLSX == "":
             return
         self.dlg.lineEditXLSXFile.setText(self.fileXLSX)
+
+        self.setLayerUpdate()
         self.storeSettings()
 
     def toolButtonGPKGSelect(self):
         """Select the Geopackage to export the data to"""
-        filename  = QFileDialog.getSaveFileName(None, 'Waehle Geopackage-Ausgabedatei:', self.fileGPKG, "Geopackage-File (*.gpkg)")
+        filename = QFileDialog.getSaveFileName(
+            None, 'Waehle Geopackage-Ausgabedatei:', self.fileGPKG, "Geopackage-File (*.gpkg)")
         self.fileGPKG = filename[0]
         if self.fileGPKG == "":
             return
         self.dlg.lineEditGPKGFile.setText(self.fileGPKG)
         self.storeSettings()
+
+    def setLayerUpdate(self):
+        """Set the RadioButton LayerUpdate dependent on geopackage existance"""
+
+        b = False
+        if not os.path.exists(self.fileGPKG):
+            b = False
+        self.dlg.radioButtonLayerUpdate.setEnabled(b)
 
     def storeSettings(self):
         """Store the settings into global QGIS-Settings"""
@@ -252,7 +275,8 @@ class OrnithoXLSXImporter:
         s = QSettings()
         self.fileXLSX = s.value("OrnithoXLSXImporter/fileXLSX", defaultXLSX)
         self.fileGPKG = s.value("OrnithoXLSXImporter/fileGPKG", defaultGPKG)
-        self.layerGPKG = s.value("OrnithoXLSXImporter/layerGPKG", defaultLayerGPKG)
+        self.layerGPKG = s.value(
+            "OrnithoXLSXImporter/layerGPKG", defaultLayerGPKG)
 
     def clearSettings(self):
         """Delete the settings from global QGIS-Settings"""
