@@ -6,6 +6,8 @@ from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 
+__version__ = "0.1.0alpha1"
+
 
 class OrnithoGeopackage:
     """Geopackage to hold data from Ornitho"""
@@ -150,6 +152,24 @@ class OrnithoGeopackage:
 
         return colnames
 
+    def layerList(self):
+        """Get names of all layers in current geopackage"""
+        layerCount = self.ds.GetLayerCount()
+        layerList = []
+
+        for i in range(0, layerCount):
+            daLayer = self.ds.GetLayerByIndex(i)
+            if daLayer:
+                daName = daLayer.GetName()
+                if not daName in layerList:
+                    layerList.append(daName)
+
+        layerList.sort()
+        return layerList
+
 
 # test = OrnithoGeopackage(
-#    "w:\Develop\OrnithoXLSXmporter\Data\jok_test_new.gpkg", "ornitho")
+#    "w:\Develop\OrnithoXLSXmporter\Data\jok_test_new2.gpkg", "ornitho")
+
+#layerList = test.layerList()
+# print(layerList)
