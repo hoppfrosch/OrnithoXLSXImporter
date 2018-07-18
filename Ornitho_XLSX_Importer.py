@@ -25,6 +25,8 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QFileDialog
 
+from osgeo import ogr
+
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
@@ -33,7 +35,7 @@ from .Ornitho_Geopackage import OrnithoGeopackage
 
 import os.path
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 class OrnithoXLSXImporter:
@@ -84,8 +86,11 @@ class OrnithoXLSXImporter:
             self.toolButtonXLSXSelect)
         self.dlg.toolButtonGPKGSelect.clicked.connect(
             self.toolButtonGPKGSelect)
+        self.dlg.lineEditGPKGFile.textChanged.connect(
+            self.populateLayerDropdown)
 
         self.layerGPKG = os.path.splitext(os.path.basename(self.fileXLSX))[0]
+        self.fileGPKGPrev = ""
         self.dlg.comboBoxLayerGPKG.setCurrentText(self.layerGPKG)
 
         # ToDo: implement Not yet implemented Features - until then disable corresponding options
@@ -222,7 +227,7 @@ class OrnithoXLSXImporter:
         # See if OK was pressed
         if result:
             # OK button was pressed
-            test = OrnithoGeopackage(self.fileGPKG, self.layerGPKG)
+            self.ogpkg = OrnithoGeopackage(self.fileGPKG, self.layerGPKG)
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
@@ -242,8 +247,9 @@ class OrnithoXLSXImporter:
 
     def toolButtonGPKGSelect(self):
         """Select the Geopackage to export the data to"""
-        filename = QFileDialog.getSaveFileName(
+        filename = QFileDialog.getOpenFileName(
             None, 'Waehle Geopackage-Ausgabedatei:', self.fileGPKG, "Geopackage-File (*.gpkg)")
+        self.fileGPKGPrev = self.fileGPKG
         self.fileGPKG = filename[0]
         if self.fileGPKG == "":
             return
@@ -257,6 +263,31 @@ class OrnithoXLSXImporter:
         if not os.path.exists(self.fileGPKG):
             b = False
         self.dlg.radioButtonLayerUpdate.setEnabled(b)
+
+    def populateLayerDropdown(self):
+        """Populate the Layer Dropdown with layers from current geopackage"""
+        if self.fileGPKG == self.fileGPKGPrev:
+            return 1
+        self.dlg.comboBoxLayerGPKG.clear()
+        layerList = []
+        layerList.append(os.path.splitext(os.path.basename(self.fileGPKG))[0])
+        if os.path.exists(self.fileGPKG):
+            cwd = os.getcwd()
+            path, file = os.path.split(self.fileGPKG)
+            os.chdir(path)
+            drv = ogr.GetDriverByName('GPKG')
+            ds = drv.Open(file)
+            layerCount = ds.GetLayerCount()
+            for i in range(0, layerCount):
+                daLayer = ds.GetLayerByIndex(i)
+                if daLayer:
+                    daName = daLayer.GetName()
+                    if not daName in layerList:
+                        layerList.append(daName)
+            ds.Release()
+            os.chdir(cwd)
+        layerList.sort()
+        self.dlg.comboBoxLayerGPKG.addItems(layerList)
 
     def storeSettings(self):
         """Store the settings into global QGIS-Settings"""
